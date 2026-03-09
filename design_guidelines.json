@@ -1,0 +1,195 @@
+{
+  "brand_identity": {
+    "name": "Lumina LMS",
+    "description": "A dark-mode first learning platform that prioritizes deep focus and content clarity.",
+    "core_values": [
+      "Deep Focus",
+      "Clarity over Clutter",
+      "Modern Intelligence"
+    ],
+    "mood": "Sophisticated, Tech-Forward, Immersive"
+  },
+  "typography": {
+    "font_family": {
+      "heading": "Outfit, sans-serif",
+      "body": "Plus Jakarta Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "display": "text-6xl md:text-7xl font-bold tracking-tight",
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+      "h2": "text-3xl md:text-4xl font-semibold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-tight",
+      "h4": "text-xl font-medium tracking-wide",
+      "body_lg": "text-lg leading-relaxed text-muted-foreground",
+      "body_base": "text-base leading-relaxed text-muted-foreground",
+      "caption": "text-sm text-muted-foreground tracking-wide uppercase"
+    },
+    "imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');"
+    ]
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": {
+        "DEFAULT": "#0c0a09",
+        "secondary": "#1c1917",
+        "tertiary": "#292524"
+      },
+      "foreground": {
+        "DEFAULT": "#fafaf9",
+        "muted": "#a8a29e",
+        "dim": "#57534e"
+      },
+      "primary": {
+        "DEFAULT": "#6366f1",
+        "foreground": "#ffffff",
+        "hover": "#4f46e5",
+        "dim": "rgba(99, 102, 241, 0.2)"
+      },
+      "secondary": {
+        "DEFAULT": "#f43f5e",
+        "foreground": "#ffffff",
+        "hover": "#e11d48"
+      },
+      "accent": {
+        "DEFAULT": "#10b981",
+        "foreground": "#ffffff",
+        "glow": "0 0 20px rgba(16, 185, 129, 0.3)"
+      },
+      "border": {
+        "DEFAULT": "#292524",
+        "active": "#44403c"
+      }
+    },
+    "gradients": {
+      "hero": "linear-gradient(to right bottom, #6366f1, #f43f5e)",
+      "card_hover": "linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0))",
+      "glass": "rgba(12, 10, 9, 0.7)"
+    }
+  },
+  "visual_enhancers": {
+    "radius": {
+      "default": "0.75rem",
+      "button": "0.5rem",
+      "card": "1rem"
+    },
+    "shadows": {
+      "glow": "0 0 40px -10px rgba(99, 102, 241, 0.3)",
+      "card": "0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)",
+      "glass": "0 8px 32px 0 rgba(0, 0, 0, 0.37)"
+    },
+    "effects": {
+      "glass_morphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+      "grain": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")"
+    }
+  },
+  "layout_system": {
+    "container": {
+      "max_width": "max-w-7xl",
+      "padding": "px-6 md:px-12 lg:px-24"
+    },
+    "grid": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+      "cards": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+      "hero": "grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    },
+    "spacing": {
+      "section_gap": "py-24 md:py-32",
+      "element_gap": "space-y-6"
+    }
+  },
+  "components": {
+    "Button": {
+      "base": "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "variants": {
+        "default": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_-5px_var(--primary)]",
+        "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/90",
+        "outline": "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground border-white/10",
+        "ghost": "hover:bg-accent hover:text-accent-foreground",
+        "link": "text-primary underline-offset-4 hover:underline"
+      },
+      "sizes": {
+        "default": "h-11 px-8 py-2",
+        "sm": "h-9 rounded-md px-3",
+        "lg": "h-12 rounded-md px-10 text-base"
+      }
+    },
+    "Card": {
+      "wrapper": "rounded-xl border border-white/5 bg-card text-card-foreground shadow-sm overflow-hidden relative group",
+      "header": "flex flex-col space-y-1.5 p-6",
+      "content": "p-6 pt-0",
+      "footer": "flex items-center p-6 pt-0",
+      "hover_effect": "group-hover:border-primary/50 transition-colors duration-300"
+    },
+    "Input": {
+      "base": "flex h-11 w-full rounded-md border border-input bg-black/20 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
+    },
+    "Sidebar": {
+      "container": "h-screen w-64 bg-background border-r border-border flex flex-col fixed left-0 top-0 bottom-0 z-40",
+      "item": "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors hover:bg-white/5 text-muted-foreground hover:text-foreground",
+      "active": "bg-primary/10 text-primary hover:bg-primary/15"
+    }
+  },
+  "assets": {
+    "hero_image": "https://images.unsplash.com/photo-1758117169154-ba6ffd8f51ad?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMDNkJTIwZ2VvbWV0cmljJTIwc2hhcGVzJTIwZmxvYXRpbmclMjBkYXJrJTIwYmFja2dyb3VuZCUyMGJsdWUlMjBwdXJwbGUlMjBsaWdodHxlbnwwfHx8fDE3NzMwOTA3OTh8MA&ixlib=rb-4.1.0&q=85",
+    "course_covers": {
+      "coding": "https://images.unsplash.com/photo-1513746199652-7a5904642685?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBjb2RpbmclMjBvbiUyMGxhcHRvcCUyMHNjcmVlbiUyMGRhcmslMjByb29tfGVufDB8fHx8MTc3MzA5MDc5OXww&ixlib=rb-4.1.0&q=85",
+      "design": "https://images.unsplash.com/photo-1758873271761-6cfe9b4f000c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjcmVhdGl2ZSUyMG9mZmljZSUyMG1lZXRpbmclMjBkaXZlcnNlJTIwdGVhbXxlbnwwfHx8fDE3NzMwOTA4MDB8MA&ixlib=rb-4.1.0&q=85",
+      "business": "https://images.unsplash.com/photo-1758691737182-d42aefd6dee8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBjcmVhdGl2ZSUyMG9mZmljZSUyMG1lZXRpbmclMjBkaXZlcnNlJTIwdGVhbXxlbnwwfHx8fDE3NzMwOTA4MDB8MA&ixlib=rb-4.1.0&q=85"
+    },
+    "avatars": [
+      "https://images.unsplash.com/photo-1675186914580-94356f7c012c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDV8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMGRpdmVyc2UlMjBwZW9wbGUlMjBoZWFkc2hvdCUyMHNtaWxpbmd8ZW58MHx8fHwxNzczMDkwODAxfDA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1650213236604-6dd826c965c0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDV8MHwxfHNlYXJjaHw0fHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMGRpdmVyc2UlMjBwZW9wbGUlMjBoZWFkc2hvdCUyMHNtaWxpbmd8ZW58MHx8fHwxNzczMDkwODAxfDA&ixlib=rb-4.1.0&q=85"
+    ]
+  },
+  "motion": {
+    "defaults": {
+      "transition": {
+        "type": "spring",
+        "stiffness": 260,
+        "damping": 20
+      },
+      "hover": {
+        "scale": 1.02,
+        "y": -2
+      }
+    },
+    "variants": {
+      "fadeIn": {
+        "initial": { "opacity": 0, "y": 20 },
+        "animate": { "opacity": 1, "y": 0 }
+      },
+      "staggerContainer": {
+        "animate": {
+          "transition": {
+            "staggerChildren": 0.1
+          }
+        }
+      }
+    }
+  },
+  "accessibility": {
+    "contrast_check": "Ensure all text has at least 4.5:1 contrast ratio against the dark background. Use lighter grays (e.g., Zinc-200) for body text, not dark gray.",
+    "focus_states": "All interactive elements MUST have a visible ring/border on focus. Use 'ring-2 ring-primary ring-offset-2 ring-offset-background'.",
+    "reduced_motion": "Respect 'prefers-reduced-motion'. Use 'motion-safe:animate-...' classes."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react', 'framer-motion', 'clsx', 'tailwind-merge' immediately.",
+    "2. THEME: Apply the dark theme colors to 'tailwind.config.js' first. Do not assume default Shadcn colors.",
+    "3. FONTS: Add the Google Fonts import to 'index.css' top. Update 'tailwind.config.js' fontFamily.",
+    "4. COMPONENTS: When building the dashboard, use the 'Bento Grid' layout. Do not create a generic list.",
+    "5. AUTH: For the login page, use a split layout: Left side = Branding/Hero Image (Use the 'hero_image' from assets), Right side = Login Form.",
+    "6. PLAYER: For the Course Player, use a 'Cinema Mode' approach: Dark background, video takes center stage, sidebar is collapsible.",
+    "7. TESTING: Add 'data-testid' to all buttons, inputs, and links.",
+    "8. IMAGES: Use the provided Unsplash URLs. Do not use placeholders like 'via.placeholder.com'."
+  ],
+  "universal_guidelines": [
+    "Don't make generic centered layouts.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for headers and modals.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Add 'data-testid' to all interactive elements."
+  ]
+}
