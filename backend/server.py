@@ -7,6 +7,7 @@ from sqlalchemy import select, func, update, delete
 from sqlalchemy.orm import selectinload
 import os
 import logging
+import json
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
@@ -15,6 +16,7 @@ from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import httpx
+from openai import OpenAI
 
 from database import get_db, engine, Base
 from models import (
@@ -34,6 +36,9 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 # GitHub OAuth Configuration
 GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET')
+
+# DeepSeek AI Configuration
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY')
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -259,6 +264,43 @@ class PlatformStats(BaseModel):
 class UserAdminResponse(UserResponse):
     courses_count: int = 0
     enrollments_count: int = 0
+
+# AI Generation Schemas
+class AIGenerateCourseRequest(BaseModel):
+    topic: str
+    level: CourseLevel = CourseLevel.BEGINNER
+    num_lessons: int = 5
+    language: str = "es"
+
+class AIGeneratedLesson(BaseModel):
+    title: str
+    description: str
+    content: str
+    lesson_type: str = "text"
+    duration_minutes: int = 10
+
+class AIGeneratedCourse(BaseModel):
+    title: str
+    description: str
+    category: str
+    level: str
+    lessons: List[AIGeneratedLesson]
+
+class AIGenerateQuizRequest(BaseModel):
+    course_id: str
+    topic: Optional[str] = None
+    num_questions: int = 5
+    language: str = "es"
+
+class AIGeneratedQuestion(BaseModel):
+    question_text: str
+    options: List[str]
+    correct_option: int
+
+class AIGeneratedQuiz(BaseModel):
+    title: str
+    description: str
+    questions: List[AIGeneratedQuestion]
 
 # ==================== HELPER FUNCTIONS ====================
 
@@ -1657,6 +1699,265 @@ async def root():
 @api_router.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+# ==================== AI GENERATION ROUTES ====================
+
+def get_deepseek_client():
+    """Initialize DeepSeek client using OpenAI SDK"""
+    return OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+
+@api_router.post("/ai/generate-course", response_model=AIGeneratedCourse)
+async def ai_generate_course(
+    request: AIGenerateCourseRequest,
+    current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))
+):
+    """Generate a complete course structure using DeepSeek AI"""
+    if not DEEPSEEK_API_KEY:
+        raise HTTPException(status_code=500, detail="DeepSeek API key not configured")
+    
+    try:
+        client = get_deepseek_client()
+        
+        level_map = {"beginner": "principiante", "intermediate": "intermedio", "advanced": "avanzado"}
+        level_text = level_map.get(request.level.value, request.level.value)
+        
+        prompt = f"""Genera un curso completo sobre "{request.topic}" para nivel {level_text}.
+        
+El curso debe tener exactamente {request.num_lessons} lecciones.
+
+Responde SOLO con un JSON válido (sin markdown, sin ```json```) con esta estructura exacta:
+{{
+    "title": "Título del curso",
+    "description": "Descripción detallada del curso (2-3 oraciones)",
+    "category": "Categoría del curso",
+    "level": "{request.level.value}",
+    "lessons": [
+        {{
+            "title": "Título de la lección",
+            "description": "Breve descripción de la lección",
+            "content": "<h2>Título</h2><p>Contenido HTML completo de la lección con al menos 3 párrafos educativos...</p><h3>Subtítulo</h3><p>Más contenido...</p>",
+            "lesson_type": "text",
+            "duration_minutes": 15
+        }}
+    ]
+}}
+
+Idioma: {"Español" if request.language == "es" else "English"}
+Importante: El contenido de cada lección debe ser educativo y detallado en formato HTML."""
+
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "Eres un experto en diseño instruccional que crea cursos educativos de alta calidad. Siempre respondes con JSON válido sin formato markdown."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=4000
+        )
+        
+        content = response.choices[0].message.content.strip()
+        # Clean up potential markdown formatting
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        content = content.strip()
+        
+        course_data = json.loads(content)
+        
+        return AIGeneratedCourse(**course_data)
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON parse error: {e}, content: {content[:500]}")
+        raise HTTPException(status_code=500, detail="Error parsing AI response")
+    except Exception as e:
+        logger.error(f"AI generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+
+@api_router.post("/ai/generate-quiz", response_model=AIGeneratedQuiz)
+async def ai_generate_quiz(
+    request: AIGenerateQuizRequest,
+    current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN])),
+    db: AsyncSession = Depends(get_db)
+):
+    """Generate quiz questions using DeepSeek AI based on course content"""
+    if not DEEPSEEK_API_KEY:
+        raise HTTPException(status_code=500, detail="DeepSeek API key not configured")
+    
+    # Get course info
+    result = await db.execute(
+        select(Course).options(selectinload(Course.lessons)).where(Course.id == request.course_id)
+    )
+    course = result.scalar_one_or_none()
+    
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    if current_user.role != UserRole.ADMIN and course.instructor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Build context from course content
+    course_context = f"Curso: {course.title}\nDescripción: {course.description}\n\nLecciones:\n"
+    for lesson in course.lessons:
+        course_context += f"- {lesson.title}: {lesson.description or ''}\n"
+        if lesson.content:
+            # Strip HTML for context
+            import re
+            clean_content = re.sub('<[^<]+?>', '', lesson.content)[:500]
+            course_context += f"  Contenido: {clean_content}...\n"
+    
+    topic = request.topic or course.title
+    
+    try:
+        client = get_deepseek_client()
+        
+        prompt = f"""Basándote en el siguiente curso, genera un quiz de {request.num_questions} preguntas de opción múltiple.
+
+{course_context}
+
+Tema específico para el quiz: {topic}
+
+Responde SOLO con un JSON válido (sin markdown, sin ```json```) con esta estructura:
+{{
+    "title": "Quiz: {topic}",
+    "description": "Evalúa tu conocimiento sobre {topic}",
+    "questions": [
+        {{
+            "question_text": "¿Pregunta clara y específica?",
+            "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+            "correct_option": 0
+        }}
+    ]
+}}
+
+Requisitos:
+- Exactamente {request.num_questions} preguntas
+- Cada pregunta debe tener exactamente 4 opciones
+- correct_option es el índice (0-3) de la respuesta correcta
+- Las preguntas deben evaluar comprensión real, no memorización
+- Idioma: {"Español" if request.language == "es" else "English"}"""
+
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "Eres un experto en evaluación educativa. Creas preguntas de quiz desafiantes pero justas. Siempre respondes con JSON válido."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        content = content.strip()
+        
+        quiz_data = json.loads(content)
+        
+        return AIGeneratedQuiz(**quiz_data)
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON parse error: {e}")
+        raise HTTPException(status_code=500, detail="Error parsing AI response")
+    except Exception as e:
+        logger.error(f"AI quiz generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+
+@api_router.post("/ai/create-course-from-generated")
+async def create_course_from_generated(
+    generated: AIGeneratedCourse,
+    current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN])),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create an actual course from AI-generated content"""
+    # Create the course
+    course = Course(
+        title=generated.title,
+        description=generated.description,
+        category=generated.category,
+        level=CourseLevel(generated.level),
+        is_free=True,
+        instructor_id=current_user.id
+    )
+    db.add(course)
+    await db.flush()
+    
+    # Create lessons
+    for order, lesson_data in enumerate(generated.lessons, start=1):
+        lesson = Lesson(
+            title=lesson_data.title,
+            description=lesson_data.description,
+            content=lesson_data.content,
+            lesson_type=LessonType(lesson_data.lesson_type),
+            duration_minutes=lesson_data.duration_minutes,
+            order=order,
+            course_id=course.id
+        )
+        db.add(lesson)
+    
+    await db.commit()
+    await db.refresh(course)
+    
+    return {
+        "message": "Course created successfully",
+        "course_id": course.id,
+        "title": course.title,
+        "lessons_count": len(generated.lessons)
+    }
+
+@api_router.post("/ai/create-quiz-from-generated")
+async def create_quiz_from_generated(
+    course_id: str,
+    generated: AIGeneratedQuiz,
+    current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN])),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create an actual quiz from AI-generated content"""
+    # Verify course ownership
+    result = await db.execute(select(Course).where(Course.id == course_id))
+    course = result.scalar_one_or_none()
+    
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    if current_user.role != UserRole.ADMIN and course.instructor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Create the quiz
+    quiz = Quiz(
+        title=generated.title,
+        description=generated.description,
+        course_id=course_id,
+        passing_score=70
+    )
+    db.add(quiz)
+    await db.flush()
+    
+    # Create questions
+    for order, q_data in enumerate(generated.questions):
+        question = QuizQuestion(
+            quiz_id=quiz.id,
+            question_text=q_data.question_text,
+            options=q_data.options,
+            correct_option=q_data.correct_option,
+            order=order
+        )
+        db.add(question)
+    
+    await db.commit()
+    await db.refresh(quiz)
+    
+    return {
+        "message": "Quiz created successfully",
+        "quiz_id": quiz.id,
+        "title": quiz.title,
+        "questions_count": len(generated.questions)
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
