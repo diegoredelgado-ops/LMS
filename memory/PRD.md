@@ -9,10 +9,11 @@ A full-stack Learning Management System (LMS) built for 500+ concurrent users wi
 - **Database**: Supabase PostgreSQL
 - **Authentication**: JWT tokens + GitHub OAuth
 - **Payments**: Stripe test mode integration
+- **AI Generation**: OpenAI GPT-4o via Emergent LLM Key
 
 ## User Personas
 1. **Students** - Browse courses, enroll, track progress, take quizzes
-2. **Instructors** - Create/manage courses, add lessons, view student stats
+2. **Instructors** - Create/manage courses, add lessons, view student stats, **generate courses with AI**
 3. **Admins** - Platform oversight, user management, statistics
 
 ## Core Requirements (Implemented)
@@ -28,12 +29,18 @@ A full-stack Learning Management System (LMS) built for 500+ concurrent users wi
 - [x] Cover images, categories, levels (beginner/intermediate/advanced)
 - [x] Free and paid course support
 - [x] Course publishing workflow
+- [x] **AI-powered course generation** (NEW)
 
 ### Lesson Types
 - [x] Video lessons (YouTube/Vimeo embedding)
 - [x] Rich text lessons (HTML content)
 - [x] File-based lessons (PDF/documents)
 - [x] Drag-and-drop lesson reordering
+
+### Quizzes
+- [x] Multiple choice quizzes
+- [x] **AI-powered quiz generation** (NEW)
+- [x] Quiz scoring and results
 
 ### Student Experience
 - [x] Course catalog with search and filters
@@ -44,7 +51,7 @@ A full-stack Learning Management System (LMS) built for 500+ concurrent users wi
 
 ### Dashboards
 - [x] Student dashboard (enrolled courses, progress, recommendations)
-- [x] Instructor dashboard (courses, student stats, revenue)
+- [x] Instructor dashboard (courses, student stats, revenue, **AI generation**)
 - [x] Admin dashboard (user management, platform statistics)
 
 ### Payments
@@ -54,12 +61,27 @@ A full-stack Learning Management System (LMS) built for 500+ concurrent users wi
 
 ## What's Been Implemented (March 2026)
 
+### AI-Powered Generation (NEW)
+- **Course Generation**: Instructors can generate complete courses with:
+  - Title and description
+  - Category and level
+  - Multiple lessons with HTML content
+  - Customizable number of lessons (3-10)
+  - Spanish and English support
+  
+- **Quiz Generation**: Instructors can generate quizzes with:
+  - Multiple choice questions based on course content
+  - Automatic correct answer selection
+  - Customizable number of questions (5-20)
+  - Context-aware questions from lesson content
+
 ### Backend (FastAPI)
-- Complete REST API with 30+ endpoints
+- Complete REST API with 35+ endpoints
 - PostgreSQL with SQLAlchemy async
 - JWT authentication with role-based permissions
 - Stripe payment integration
 - GitHub OAuth callback handling
+- **Emergent LLM integration for AI generation**
 
 ### Frontend (React)
 - Dark theme with glass-morphism design
@@ -68,11 +90,12 @@ A full-stack Learning Management System (LMS) built for 500+ concurrent users wi
 - Course editor with drag-and-drop
 - Video player with YouTube/Vimeo support
 - Progress tracking UI
+- **AI Generation Modals for courses and quizzes**
 
 ### Database Schema
 - Users, Courses, Lessons, Enrollments
-- Progress tracking, Quizzes, Comments
-- Payment transactions
+- Progress tracking, Quizzes, Quiz Questions, Quiz Attempts
+- Comments, Payment transactions
 
 ## P0/P1/P2 Features Remaining
 
