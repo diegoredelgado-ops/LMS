@@ -16,13 +16,16 @@ import {
   FileText,
   File,
   Save,
-  Eye
+  Eye,
+  Sparkles,
+  HelpCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { AIGenerateQuizModal } from '../components/AIGenerateModals';
 
 const SortableLesson = ({ lesson, onEdit, onDelete }) => {
   const {
@@ -99,6 +102,8 @@ const CourseEditor = () => {
   const [saving, setSaving] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
   const [showLessonForm, setShowLessonForm] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [quizzes, setQuizzes] = useState([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -118,6 +123,14 @@ const CourseEditor = () => {
       const response = await api.get(`/courses/${courseId}`);
       setCourse(response.data);
       setLessons(response.data.lessons || []);
+      
+      // Fetch quizzes for the course
+      try {
+        const quizzesRes = await api.get(`/courses/${courseId}/quizzes`);
+        setQuizzes(quizzesRes.data);
+      } catch (e) {
+        console.log('No quizzes yet');
+      }
     } catch (error) {
       console.error('Failed to fetch course:', error);
       toast.error('Course not found');
@@ -395,12 +408,71 @@ const CourseEditor = () => {
           </section>
         )}
 
+        {/* Quizzes Section */}
+        {!isNewCourse && (
+          <section className="glass-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Quizzes ({quizzes.length})</h2>
+              <Button 
+                onClick={() => setShowQuizModal(true)} 
+                variant="outline"
+                className="border-secondary/50 text-secondary hover:bg-secondary/10"
+                data-testid="ai-generate-quiz-btn"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generar Quiz con IA
+              </Button>
+            </div>
+
+            {quizzes.length === 0 ? (
+              <div className="text-center py-12">
+                <HelpCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">No quizzes yet. Generate a quiz with AI to evaluate your students.</p>
+                <Button onClick={() => setShowQuizModal(true)} variant="outline">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Quiz with AI
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {quizzes.map((quiz) => (
+                  <div key={quiz.id} className="glass-card p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded bg-secondary/20 flex items-center justify-center text-secondary">
+                      <HelpCircle className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{quiz.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {quiz.questions?.length || 0} preguntas • Puntaje mínimo: {quiz.passing_score}%
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
         {/* Lesson Form Modal */}
         {showLessonForm && (
           <LessonForm
             lesson={editingLesson}
             onSave={handleSaveLesson}
             onClose={() => { setShowLessonForm(false); setEditingLesson(null); }}
+          />
+        )}
+
+        {/* AI Quiz Modal */}
+        {showQuizModal && (
+          <AIGenerateQuizModal
+            courseId={courseId}
+            courseName={course.title}
+            onClose={() => setShowQuizModal(false)}
+            onQuizCreated={(quizId) => {
+              setShowQuizModal(false);
+              fetchCourse();
+              toast.success('Quiz creado y agregado al curso');
+            }}
           />
         )}
       </main>

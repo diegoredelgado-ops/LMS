@@ -40,6 +40,9 @@ GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET')
 # DeepSeek AI Configuration
 DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY')
 
+# Emergent LLM Configuration  
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -1702,25 +1705,42 @@ async def health_check():
 
 # ==================== AI GENERATION ROUTES ====================
 
-def get_deepseek_client():
-    """Initialize DeepSeek client using OpenAI SDK"""
-    return OpenAI(
-        api_key=DEEPSEEK_API_KEY,
-        base_url="https://api.deepseek.com"
-    )
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+import re
+
+async def generate_with_llm(system_message: str, user_prompt: str) -> str:
+    """Generate content using Emergent LLM (OpenAI GPT)"""
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"course-gen-{uuid.uuid4()}",
+        system_message=system_message
+    ).with_model("openai", "gpt-4o")
+    
+    user_message = UserMessage(text=user_prompt)
+    response = await chat.send_message(user_message)
+    return response
+
+def clean_json_response(content: str) -> str:
+    """Clean markdown formatting from JSON response"""
+    content = content.strip()
+    if content.startswith("```"):
+        parts = content.split("```")
+        if len(parts) >= 2:
+            content = parts[1]
+            if content.startswith("json"):
+                content = content[4:]
+    return content.strip()
 
 @api_router.post("/ai/generate-course", response_model=AIGeneratedCourse)
 async def ai_generate_course(
     request: AIGenerateCourseRequest,
     current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN]))
 ):
-    """Generate a complete course structure using DeepSeek AI"""
-    if not DEEPSEEK_API_KEY:
-        raise HTTPException(status_code=500, detail="DeepSeek API key not configured")
+    """Generate a complete course structure using AI"""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI API key not configured")
     
     try:
-        client = get_deepseek_client()
-        
         level_map = {"beginner": "principiante", "intermediate": "intermedio", "advanced": "avanzado"}
         level_text = level_map.get(request.level.value, request.level.value)
         
@@ -1748,31 +1768,17 @@ Responde SOLO con un JSON válido (sin markdown, sin ```json```) con esta estruc
 Idioma: {"Español" if request.language == "es" else "English"}
 Importante: El contenido de cada lección debe ser educativo y detallado en formato HTML."""
 
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "system", "content": "Eres un experto en diseño instruccional que crea cursos educativos de alta calidad. Siempre respondes con JSON válido sin formato markdown."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=4000
-        )
+        system_msg = "Eres un experto en diseño instruccional que crea cursos educativos de alta calidad. Siempre respondes con JSON válido sin formato markdown."
         
-        content = response.choices[0].message.content.strip()
-        # Clean up potential markdown formatting
-        if content.startswith("```"):
-            content = content.split("```")[1]
-            if content.startswith("json"):
-                content = content[4:]
-        content = content.strip()
-        
+        response = await generate_with_llm(system_msg, prompt)
+        content = clean_json_response(response)
         course_data = json.loads(content)
         
         return AIGeneratedCourse(**course_data)
         
     except json.JSONDecodeError as e:
-        logger.error(f"JSON parse error: {e}, content: {content[:500]}")
-        raise HTTPException(status_code=500, detail="Error parsing AI response")
+        logger.error(f"JSON parse error: {e}")
+        raise HTTPException(status_code=500, detail="Error parsing AI response. Please try again.")
     except Exception as e:
         logger.error(f"AI generation error: {e}")
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
@@ -1783,9 +1789,9 @@ async def ai_generate_quiz(
     current_user: User = Depends(require_role([UserRole.INSTRUCTOR, UserRole.ADMIN])),
     db: AsyncSession = Depends(get_db)
 ):
-    """Generate quiz questions using DeepSeek AI based on course content"""
-    if not DEEPSEEK_API_KEY:
-        raise HTTPException(status_code=500, detail="DeepSeek API key not configured")
+    """Generate quiz questions using AI based on course content"""
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="AI API key not configured")
     
     # Get course info
     result = await db.execute(
@@ -1804,16 +1810,12 @@ async def ai_generate_quiz(
     for lesson in course.lessons:
         course_context += f"- {lesson.title}: {lesson.description or ''}\n"
         if lesson.content:
-            # Strip HTML for context
-            import re
             clean_content = re.sub('<[^<]+?>', '', lesson.content)[:500]
             course_context += f"  Contenido: {clean_content}...\n"
     
     topic = request.topic or course.title
     
     try:
-        client = get_deepseek_client()
-        
         prompt = f"""Basándote en el siguiente curso, genera un quiz de {request.num_questions} preguntas de opción múltiple.
 
 {course_context}
@@ -1840,30 +1842,17 @@ Requisitos:
 - Las preguntas deben evaluar comprensión real, no memorización
 - Idioma: {"Español" if request.language == "es" else "English"}"""
 
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "system", "content": "Eres un experto en evaluación educativa. Creas preguntas de quiz desafiantes pero justas. Siempre respondes con JSON válido."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=2000
-        )
+        system_msg = "Eres un experto en evaluación educativa. Creas preguntas de quiz desafiantes pero justas. Siempre respondes con JSON válido."
         
-        content = response.choices[0].message.content.strip()
-        if content.startswith("```"):
-            content = content.split("```")[1]
-            if content.startswith("json"):
-                content = content[4:]
-        content = content.strip()
-        
+        response = await generate_with_llm(system_msg, prompt)
+        content = clean_json_response(response)
         quiz_data = json.loads(content)
         
         return AIGeneratedQuiz(**quiz_data)
         
     except json.JSONDecodeError as e:
         logger.error(f"JSON parse error: {e}")
-        raise HTTPException(status_code=500, detail="Error parsing AI response")
+        raise HTTPException(status_code=500, detail="Error parsing AI response. Please try again.")
     except Exception as e:
         logger.error(f"AI quiz generation error: {e}")
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")

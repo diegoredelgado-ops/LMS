@@ -14,7 +14,8 @@ import {
   EyeOff,
   Trash2,
   LogOut,
-  User
+  User,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
@@ -29,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../components/ui/alert-dialog';
+import { AIGenerateCourseModal } from '../components/AIGenerateModals';
 
 const InstructorDashboard = () => {
   const { api, user, logout, isAdmin } = useAuth();
@@ -37,6 +39,7 @@ const InstructorDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -170,10 +173,16 @@ const InstructorDashboard = () => {
               <h1 className="text-3xl font-heading font-bold mb-2">Instructor Dashboard</h1>
               <p className="text-muted-foreground">Manage your courses and track performance</p>
             </div>
-            <Button onClick={handleCreateCourse} className="glow-primary" data-testid="create-course-btn">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Course
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setShowAIModal(true)} variant="outline" className="border-primary/50 text-primary hover:bg-primary/10" data-testid="ai-generate-course-btn">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generar con IA
+              </Button>
+              <Button onClick={handleCreateCourse} className="glow-primary" data-testid="create-course-btn">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Course
+              </Button>
+            </div>
           </div>
 
           {/* Stats */}
@@ -390,6 +399,17 @@ const InstructorDashboard = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* AI Generate Course Modal */}
+      {showAIModal && (
+        <AIGenerateCourseModal
+          onClose={() => setShowAIModal(false)}
+          onCourseCreated={(courseId) => {
+            setShowAIModal(false);
+            navigate(`/courses/${courseId}/edit`);
+          }}
+        />
+      )}
     </div>
   );
 };
