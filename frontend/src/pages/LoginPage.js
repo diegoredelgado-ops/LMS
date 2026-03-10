@@ -23,10 +23,10 @@ const LoginPage = () => {
 
     try {
       await login(email, password);
-      toast.success('Welcome back!');
+      toast.success('¡Bienvenido de nuevo!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Login failed');
+      toast.error(error.response?.data?.detail || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Left Side - Branding */}
+      {/* Lado Izquierdo - Marca */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
@@ -63,18 +63,18 @@ const LoginPage = () => {
             </Link>
             
             <h1 className="text-4xl font-heading font-bold mb-4">
-              Welcome back to your{' '}
-              <span className="gradient-text">learning journey</span>
+              Bienvenido de nuevo a tu{' '}
+              <span className="gradient-text">viaje de aprendizaje</span>
             </h1>
             
             <p className="text-lg text-muted-foreground">
-              Continue where you left off. Your courses and progress are waiting for you.
+              Continúa donde lo dejaste. Tus cursos y progreso te están esperando.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
+      {/* Lado Derecho - Formulario */}
       <div className="flex-1 flex items-center justify-center p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,7 +82,7 @@ const LoginPage = () => {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md space-y-8"
         >
-          {/* Mobile Logo */}
+          {/* Logo Móvil */}
           <div className="lg:hidden text-center">
             <Link to="/" className="inline-flex items-center gap-2">
               <GraduationCap className="w-8 h-8 text-primary" />
@@ -91,16 +91,16 @@ const LoginPage = () => {
           </div>
 
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl font-heading font-bold mb-2">Sign in to your account</h2>
+            <h2 className="text-2xl font-heading font-bold mb-2">Inicia sesión en tu cuenta</h2>
             <p className="text-muted-foreground">
-              Don't have an account?{' '}
+              ¿No tienes cuenta?{' '}
               <Link to="/register" className="text-primary hover:underline" data-testid="register-link">
-                Sign up
+                Regístrate
               </Link>
             </p>
           </div>
 
-          {/* GitHub OAuth Button */}
+          {/* Botón GitHub OAuth */}
           <Button
             variant="outline"
             className="w-full h-12"
@@ -108,7 +108,7 @@ const LoginPage = () => {
             data-testid="github-login-btn"
           >
             <Github className="mr-2 h-5 w-5" />
-            Continue with GitHub
+            Continuar con GitHub
           </Button>
 
           <div className="relative">
@@ -116,20 +116,20 @@ const LoginPage = () => {
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">O continúa con</span>
             </div>
           </div>
 
-          {/* Email/Password Form */}
+          {/* Formulario Email/Contraseña */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo electrónico</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="tu@ejemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12"
@@ -141,7 +141,7 @@ const LoginPage = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Contraseña</Label>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -164,7 +164,7 @@ const LoginPage = () => {
               disabled={loading}
               data-testid="login-submit-btn"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>

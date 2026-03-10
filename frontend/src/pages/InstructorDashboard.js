@@ -57,7 +57,7 @@ const InstructorDashboard = () => {
       setCourses(coursesRes.data);
       setStats(statsRes.data);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Error al cargar datos:', error);
     } finally {
       setLoading(false);
     }
@@ -70,10 +70,10 @@ const InstructorDashboard = () => {
   const handlePublishToggle = async (courseId, currentStatus) => {
     try {
       await api.put(`/courses/${courseId}`, { is_published: !currentStatus });
-      toast.success(currentStatus ? 'Course unpublished' : 'Course published!');
+      toast.success(currentStatus ? 'Curso despublicado' : '¡Curso publicado!');
       fetchData();
     } catch (error) {
-      toast.error('Failed to update course');
+      toast.error('Error al actualizar el curso');
     }
   };
 
@@ -82,11 +82,11 @@ const InstructorDashboard = () => {
     
     try {
       await api.delete(`/courses/${deleteId}`);
-      toast.success('Course deleted');
+      toast.success('Curso eliminado');
       setDeleteId(null);
       fetchData();
     } catch (error) {
-      toast.error('Failed to delete course');
+      toast.error('Error al eliminar el curso');
     }
   };
 
@@ -97,7 +97,7 @@ const InstructorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
+      {/* Barra Lateral */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-border flex flex-col">
         <div className="p-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
@@ -114,7 +114,7 @@ const InstructorDashboard = () => {
               data-testid="nav-dashboard"
             >
               <BarChart3 className="w-5 h-5" />
-              Dashboard
+              Panel
             </Link>
             <Link
               to="/courses"
@@ -122,7 +122,7 @@ const InstructorDashboard = () => {
               data-testid="nav-courses"
             >
               <BookOpen className="w-5 h-5" />
-              Browse Courses
+              Explorar Cursos
             </Link>
             {isAdmin && (
               <Link
@@ -131,7 +131,7 @@ const InstructorDashboard = () => {
                 data-testid="nav-admin"
               >
                 <Users className="w-5 h-5" />
-                Admin Panel
+                Panel Admin
               </Link>
             )}
             <Link
@@ -140,7 +140,7 @@ const InstructorDashboard = () => {
               data-testid="nav-profile"
             >
               <User className="w-5 h-5" />
-              Profile
+              Perfil
             </Link>
           </div>
         </nav>
@@ -148,30 +148,32 @@ const InstructorDashboard = () => {
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'User')}&background=6366f1&color=fff`}
+              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'Usuario')}&background=6366f1&color=fff`}
               alt={user?.full_name}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{user?.full_name}</p>
-              <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
+              <p className="text-sm text-muted-foreground capitalize">
+                {user?.role === 'instructor' ? 'Instructor' : 'Admin'}
+              </p>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start" onClick={handleLogout} data-testid="logout-btn">
             <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
+            Cerrar Sesión
           </Button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Contenido Principal */}
       <main className="ml-64 p-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
+          {/* Encabezado */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-heading font-bold mb-2">Instructor Dashboard</h1>
-              <p className="text-muted-foreground">Manage your courses and track performance</p>
+              <h1 className="text-3xl font-heading font-bold mb-2">Panel del Instructor</h1>
+              <p className="text-muted-foreground">Administra tus cursos y revisa el rendimiento</p>
             </div>
             <div className="flex items-center gap-3">
               <Button onClick={() => setShowAIModal(true)} variant="outline" className="border-primary/50 text-primary hover:bg-primary/10" data-testid="ai-generate-course-btn">
@@ -180,12 +182,12 @@ const InstructorDashboard = () => {
               </Button>
               <Button onClick={handleCreateCourse} className="glow-primary" data-testid="create-course-btn">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Course
+                Crear Curso
               </Button>
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Estadísticas */}
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <motion.div
@@ -199,7 +201,7 @@ const InstructorDashboard = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.total_courses}</p>
-                    <p className="text-sm text-muted-foreground">Total Courses</p>
+                    <p className="text-sm text-muted-foreground">Total Cursos</p>
                   </div>
                 </div>
               </motion.div>
@@ -216,7 +218,7 @@ const InstructorDashboard = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.total_students}</p>
-                    <p className="text-sm text-muted-foreground">Total Students</p>
+                    <p className="text-sm text-muted-foreground">Total Estudiantes</p>
                   </div>
                 </div>
               </motion.div>
@@ -233,7 +235,7 @@ const InstructorDashboard = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.avg_progress}%</p>
-                    <p className="text-sm text-muted-foreground">Avg Progress</p>
+                    <p className="text-sm text-muted-foreground">Progreso Prom.</p>
                   </div>
                 </div>
               </motion.div>
@@ -250,16 +252,16 @@ const InstructorDashboard = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">${stats.total_revenue}</p>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-sm text-muted-foreground">Ingresos Totales</p>
                   </div>
                 </div>
               </motion.div>
             </div>
           )}
 
-          {/* Courses List */}
+          {/* Lista de Cursos */}
           <section>
-            <h2 className="text-xl font-heading font-semibold mb-6">Your Courses</h2>
+            <h2 className="text-xl font-heading font-semibold mb-6">Tus Cursos</h2>
 
             {loading ? (
               <div className="space-y-4">
@@ -279,14 +281,20 @@ const InstructorDashboard = () => {
             ) : courses.length === 0 ? (
               <div className="text-center py-16 glass-card">
                 <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No courses yet</h3>
+                <h3 className="text-xl font-semibold mb-2">Aún no tienes cursos</h3>
                 <p className="text-muted-foreground mb-6">
-                  Create your first course and start teaching
+                  Crea tu primer curso y comienza a enseñar
                 </p>
-                <Button onClick={handleCreateCourse} className="glow-primary">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Course
-                </Button>
+                <div className="flex justify-center gap-3">
+                  <Button onClick={() => setShowAIModal(true)} variant="outline">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generar con IA
+                  </Button>
+                  <Button onClick={handleCreateCourse} className="glow-primary">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Crear Curso
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -311,11 +319,11 @@ const InstructorDashboard = () => {
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="text-lg font-semibold">{course.title}</h3>
                               <Badge variant={course.is_published ? 'default' : 'secondary'}>
-                                {course.is_published ? 'Published' : 'Draft'}
+                                {course.is_published ? 'Publicado' : 'Borrador'}
                               </Badge>
                             </div>
                             <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                              {course.description || 'No description'}
+                              {course.description || 'Sin descripción'}
                             </p>
                           </div>
                         </div>
@@ -323,15 +331,15 @@ const InstructorDashboard = () => {
                         <div className="flex items-center gap-6 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <BookOpen className="w-4 h-4" />
-                            {course.lessons_count} lessons
+                            {course.lessons_count} lecciones
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
-                            {course.students_count} students
+                            {course.students_count} estudiantes
                           </span>
                           <span className="flex items-center gap-1">
                             <DollarSign className="w-4 h-4" />
-                            {course.is_free ? 'Free' : `$${course.price}`}
+                            {course.is_free ? 'Gratis' : `$${course.price}`}
                           </span>
                         </div>
                       </div>
@@ -340,7 +348,7 @@ const InstructorDashboard = () => {
                         <Link to={`/courses/${course.id}/edit`}>
                           <Button variant="outline" size="sm" className="w-full" data-testid={`edit-course-${course.id}`}>
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            Editar
                           </Button>
                         </Link>
                         <Button
@@ -352,12 +360,12 @@ const InstructorDashboard = () => {
                           {course.is_published ? (
                             <>
                               <EyeOff className="w-4 h-4 mr-2" />
-                              Unpublish
+                              Despublicar
                             </>
                           ) : (
                             <>
                               <Eye className="w-4 h-4 mr-2" />
-                              Publish
+                              Publicar
                             </>
                           )}
                         </Button>
@@ -369,7 +377,7 @@ const InstructorDashboard = () => {
                           data-testid={`delete-course-${course.id}`}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
+                          Eliminar
                         </Button>
                       </div>
                     </div>
@@ -381,26 +389,26 @@ const InstructorDashboard = () => {
         </div>
       </main>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Diálogo de Confirmación de Eliminación */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Course</AlertDialogTitle>
+            <AlertDialogTitle>Eliminar Curso</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this course? This action cannot be undone.
-              All lessons, enrollments, and progress data will be permanently removed.
+              ¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.
+              Todas las lecciones, inscripciones y datos de progreso serán eliminados permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* AI Generate Course Modal */}
+      {/* Modal de Generación de Curso con IA */}
       {showAIModal && (
         <AIGenerateCourseModal
           onClose={() => setShowAIModal(false)}

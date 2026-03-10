@@ -11,8 +11,7 @@ import {
   ChevronRight,
   Play,
   LogOut,
-  User,
-  Settings
+  User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -32,18 +31,16 @@ const StudentDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch enrollments
       const enrollmentsRes = await api.get('/enrollments');
       setEnrollments(enrollmentsRes.data);
       
-      // Fetch recommended courses (ones not enrolled in)
       const coursesRes = await api.get('/courses?limit=6');
       const enrolledIds = enrollmentsRes.data.map(e => e.course_id);
       setRecommendedCourses(
         coursesRes.data.filter(c => !enrolledIds.includes(c.id)).slice(0, 4)
       );
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Error al cargar datos:', error);
     } finally {
       setLoading(false);
     }
@@ -59,7 +56,7 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
+      {/* Barra Lateral */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-border flex flex-col">
         <div className="p-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
@@ -76,7 +73,7 @@ const StudentDashboard = () => {
               data-testid="nav-dashboard"
             >
               <BookOpen className="w-5 h-5" />
-              Dashboard
+              Panel
             </Link>
             <Link
               to="/courses"
@@ -84,7 +81,7 @@ const StudentDashboard = () => {
               data-testid="nav-courses"
             >
               <Play className="w-5 h-5" />
-              Browse Courses
+              Explorar Cursos
             </Link>
             <Link
               to="/profile"
@@ -92,7 +89,7 @@ const StudentDashboard = () => {
               data-testid="nav-profile"
             >
               <User className="w-5 h-5" />
-              Profile
+              Perfil
             </Link>
           </div>
         </nav>
@@ -100,34 +97,36 @@ const StudentDashboard = () => {
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'User')}&background=6366f1&color=fff`}
+              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'Usuario')}&background=6366f1&color=fff`}
               alt={user?.full_name}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{user?.full_name}</p>
-              <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
+              <p className="text-sm text-muted-foreground capitalize">
+                {user?.role === 'student' ? 'Estudiante' : user?.role === 'instructor' ? 'Instructor' : 'Admin'}
+              </p>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start" onClick={handleLogout} data-testid="logout-btn">
             <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
+            Cerrar Sesión
           </Button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Contenido Principal */}
       <main className="ml-64 p-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
+          {/* Encabezado */}
           <div className="mb-8">
             <h1 className="text-3xl font-heading font-bold mb-2">
-              Welcome back, {user?.full_name?.split(' ')[0]}!
+              ¡Bienvenido, {user?.full_name?.split(' ')[0]}!
             </h1>
-            <p className="text-muted-foreground">Continue your learning journey</p>
+            <p className="text-muted-foreground">Continúa tu viaje de aprendizaje</p>
           </div>
 
-          {/* Stats */}
+          {/* Estadísticas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -140,7 +139,7 @@ const StudentDashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{inProgress.length}</p>
-                  <p className="text-sm text-muted-foreground">In Progress</p>
+                  <p className="text-sm text-muted-foreground">En Progreso</p>
                 </div>
               </div>
             </motion.div>
@@ -157,7 +156,7 @@ const StudentDashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{completed.length}</p>
-                  <p className="text-sm text-muted-foreground">Completed</p>
+                  <p className="text-sm text-muted-foreground">Completados</p>
                 </div>
               </div>
             </motion.div>
@@ -174,19 +173,19 @@ const StudentDashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{enrollments.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Courses</p>
+                  <p className="text-sm text-muted-foreground">Total de Cursos</p>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Continue Learning */}
+          {/* Continuar Aprendiendo */}
           {inProgress.length > 0 && (
             <section className="mb-12">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-heading font-semibold">Continue Learning</h2>
+                <h2 className="text-xl font-heading font-semibold">Continuar Aprendiendo</h2>
                 <Link to="/courses" className="text-primary text-sm hover:underline">
-                  Browse more →
+                  Explorar más →
                 </Link>
               </div>
 
@@ -213,12 +212,12 @@ const StudentDashboard = () => {
                           {enrollment.course?.title}
                         </h3>
                         <p className="text-sm text-muted-foreground mb-3">
-                          {enrollment.completed_lessons} of {enrollment.total_lessons} lessons
+                          {enrollment.completed_lessons} de {enrollment.total_lessons} lecciones
                         </p>
                         <div className="space-y-1">
                           <Progress value={enrollment.progress_percentage} className="h-2" />
                           <p className="text-xs text-muted-foreground">
-                            {Math.round(enrollment.progress_percentage)}% complete
+                            {Math.round(enrollment.progress_percentage)}% completado
                           </p>
                         </div>
                       </div>
@@ -230,10 +229,10 @@ const StudentDashboard = () => {
             </section>
           )}
 
-          {/* Completed Courses */}
+          {/* Cursos Completados */}
           {completed.length > 0 && (
             <section className="mb-12">
-              <h2 className="text-xl font-heading font-semibold mb-6">Completed Courses</h2>
+              <h2 className="text-xl font-heading font-semibold mb-6">Cursos Completados</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {completed.map((enrollment, index) => (
                   <motion.div
@@ -253,7 +252,7 @@ const StudentDashboard = () => {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium truncate">{enrollment.course?.title}</h3>
                           <p className="text-xs text-muted-foreground">
-                            Completed on {new Date(enrollment.completed_at).toLocaleDateString()}
+                            Completado el {new Date(enrollment.completed_at).toLocaleDateString('es-ES')}
                           </p>
                         </div>
                       </div>
@@ -264,13 +263,13 @@ const StudentDashboard = () => {
             </section>
           )}
 
-          {/* Recommended Courses */}
+          {/* Cursos Recomendados */}
           {recommendedCourses.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-heading font-semibold">Recommended for You</h2>
+                <h2 className="text-xl font-heading font-semibold">Recomendados para Ti</h2>
                 <Link to="/courses" className="text-primary text-sm hover:underline">
-                  View all →
+                  Ver todos →
                 </Link>
               </div>
 
@@ -301,7 +300,7 @@ const StudentDashboard = () => {
                           {course.title}
                         </h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {course.lessons_count} lessons
+                          {course.lessons_count} lecciones
                         </p>
                       </div>
                     </Link>
@@ -311,16 +310,16 @@ const StudentDashboard = () => {
             </section>
           )}
 
-          {/* Empty State */}
+          {/* Estado Vacío */}
           {enrollments.length === 0 && !loading && (
             <div className="text-center py-16">
               <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No courses yet</h3>
+              <h3 className="text-xl font-semibold mb-2">Aún no tienes cursos</h3>
               <p className="text-muted-foreground mb-6">
-                Start your learning journey by enrolling in a course
+                Comienza tu viaje de aprendizaje inscribiéndote en un curso
               </p>
               <Link to="/courses">
-                <Button className="glow-primary">Browse Courses</Button>
+                <Button className="glow-primary">Explorar Cursos</Button>
               </Link>
             </div>
           )}

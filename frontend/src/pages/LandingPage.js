@@ -21,36 +21,36 @@ const LandingPage = () => {
   const features = [
     {
       icon: <Video className="w-6 h-6" />,
-      title: 'Video Lessons',
-      description: 'Learn from high-quality video content from YouTube and Vimeo'
+      title: 'Lecciones en Video',
+      description: 'Aprende con contenido de alta calidad de YouTube y Vimeo'
     },
     {
       icon: <FileText className="w-6 h-6" />,
-      title: 'Rich Content',
-      description: 'Access rich text lessons and downloadable resources'
+      title: 'Contenido Rico',
+      description: 'Accede a lecciones de texto enriquecido y recursos descargables'
     },
     {
       icon: <Trophy className="w-6 h-6" />,
-      title: 'Track Progress',
-      description: 'Monitor your learning journey with progress tracking'
+      title: 'Seguimiento de Progreso',
+      description: 'Monitorea tu avance de aprendizaje con seguimiento detallado'
     },
     {
       icon: <Star className="w-6 h-6" />,
       title: 'Quizzes',
-      description: 'Test your knowledge with interactive quizzes'
+      description: 'Evalúa tu conocimiento con quizzes interactivos'
     }
   ];
 
   const stats = [
-    { value: '500+', label: 'Active Learners' },
-    { value: '50+', label: 'Expert Instructors' },
-    { value: '200+', label: 'Courses' },
-    { value: '95%', label: 'Completion Rate' }
+    { value: '500+', label: 'Estudiantes Activos' },
+    { value: '50+', label: 'Instructores Expertos' },
+    { value: '200+', label: 'Cursos' },
+    { value: '95%', label: 'Tasa de Completación' }
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
+      {/* Navegación */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           <div className="flex items-center justify-between h-16">
@@ -61,26 +61,26 @@ const LandingPage = () => {
 
             <div className="hidden md:flex items-center gap-8">
               <Link to="/courses" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="nav-courses">
-                Courses
+                Cursos
               </Link>
               {isAuthenticated ? (
                 <>
                   <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="nav-dashboard">
-                    Dashboard
+                    Panel
                   </Link>
                   <Link to="/profile" data-testid="nav-profile">
                     <Button variant="outline" size="sm">
-                      {user?.full_name || 'Profile'}
+                      {user?.full_name || 'Perfil'}
                     </Button>
                   </Link>
                 </>
               ) : (
                 <>
                   <Link to="/login" data-testid="nav-login">
-                    <Button variant="ghost" size="sm">Sign In</Button>
+                    <Button variant="ghost" size="sm">Iniciar Sesión</Button>
                   </Link>
                   <Link to="/register" data-testid="nav-register">
-                    <Button size="sm" className="glow-primary">Get Started</Button>
+                    <Button size="sm" className="glow-primary">Comenzar</Button>
                   </Link>
                 </>
               )}
@@ -89,7 +89,7 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Sección Hero */}
       <section className="pt-32 pb-24 md:pt-40 md:pb-32 px-6 md:px-12 lg:px-24">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -100,30 +100,30 @@ const LandingPage = () => {
               className="space-y-8"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <span className="text-primary text-sm font-medium">New courses every week</span>
+                <span className="text-primary text-sm font-medium">Nuevos cursos cada semana</span>
               </div>
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold tracking-tight leading-tight">
-                Learn Without{' '}
-                <span className="gradient-text">Limits</span>
+                Aprende Sin{' '}
+                <span className="gradient-text">Límites</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl">
-                Unlock your potential with expert-led courses. From coding to design, 
-                master new skills at your own pace with our comprehensive learning platform.
+                Desbloquea tu potencial con cursos dirigidos por expertos. Desde programación hasta diseño, 
+                domina nuevas habilidades a tu propio ritmo con nuestra plataforma de aprendizaje integral.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to={isAuthenticated ? "/courses" : "/register"} data-testid="hero-cta">
                   <Button size="lg" className="glow-primary group">
-                    {isAuthenticated ? "Browse Courses" : "Start Learning Free"}
+                    {isAuthenticated ? "Explorar Cursos" : "Comienza Gratis"}
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Link to="/courses" data-testid="hero-explore">
                   <Button size="lg" variant="outline">
                     <Play className="mr-2 w-4 h-4" />
-                    Explore Catalog
+                    Ver Catálogo
                   </Button>
                 </Link>
               </div>
@@ -138,13 +138,13 @@ const LandingPage = () => {
               <div className="relative">
                 <img
                   src="https://images.unsplash.com/photo-1758117169154-ba6ffd8f51ad?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMDNkJTIwZ2VvbWV0cmljJTIwc2hhcGVzJTIwZmxvYXRpbmclMjBkYXJrJTIwYmFja2dyb3VuZCUyMGJsdWUlMjBwdXJwbGUlMjBsaWdodHxlbnwwfHx8fDE3NzMwOTA3OTh8MA&ixlib=rb-4.1.0&q=85&w=800"
-                  alt="Learning illustration"
+                  alt="Ilustración de aprendizaje"
                   className="rounded-2xl w-full aspect-square object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-2xl" />
               </div>
               
-              {/* Floating Card */}
+              {/* Tarjeta Flotante */}
               <div className="absolute -bottom-6 -left-6 glass-card p-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
@@ -152,7 +152,7 @@ const LandingPage = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">500+</p>
-                    <p className="text-sm text-muted-foreground">Active Students</p>
+                    <p className="text-sm text-muted-foreground">Estudiantes Activos</p>
                   </div>
                 </div>
               </div>
@@ -161,7 +161,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Sección Estadísticas */}
       <section className="py-16 border-y border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -182,7 +182,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Sección Características */}
       <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -192,11 +192,11 @@ const LandingPage = () => {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-heading font-bold tracking-tight mb-4">
-              Everything You Need to{' '}
-              <span className="gradient-text">Succeed</span>
+              Todo lo que Necesitas para{' '}
+              <span className="gradient-text">Triunfar</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our platform provides all the tools and features you need for an effective learning experience.
+              Nuestra plataforma proporciona todas las herramientas y características que necesitas para una experiencia de aprendizaje efectiva.
             </p>
           </motion.div>
 
@@ -221,7 +221,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Sección CTA */}
       <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-background to-card">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -231,15 +231,15 @@ const LandingPage = () => {
             className="space-y-8"
           >
             <h2 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
-              Ready to Start Your Learning Journey?
+              ¿Listo para Comenzar tu Viaje de Aprendizaje?
             </h2>
             <p className="text-lg text-muted-foreground">
-              Join thousands of learners who are already transforming their careers with Lumina.
+              Únete a miles de estudiantes que ya están transformando sus carreras con Lumina.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to={isAuthenticated ? "/courses" : "/register"} data-testid="cta-button">
                 <Button size="lg" className="glow-primary">
-                  {isAuthenticated ? "Explore Courses" : "Get Started for Free"}
+                  {isAuthenticated ? "Explorar Cursos" : "Comienza Gratis"}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
@@ -248,7 +248,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Pie de Página */}
       <footer className="py-12 border-t border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -257,7 +257,7 @@ const LandingPage = () => {
               <span className="font-heading font-bold">Lumina LMS</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Lumina LMS. All rights reserved.
+              © 2024 Lumina LMS. Todos los derechos reservados.
             </p>
           </div>
         </div>

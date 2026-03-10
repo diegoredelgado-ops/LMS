@@ -6,7 +6,7 @@ from datetime import datetime
 class LMSAPITester:
     def __init__(self):
         # Use the public endpoint from frontend .env
-        self.base_url = "https://academy-pro-21.preview.emergentagent.com/api"
+        self.base_url = "https://plataforma-educativa-1.preview.emergentagent.com/api"
         self.instructor_token = None
         self.student_token = None
         self.tests_run = 0

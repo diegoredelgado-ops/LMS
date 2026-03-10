@@ -26,10 +26,10 @@ const RegisterPage = () => {
 
     try {
       await register(email, password, fullName, role);
-      toast.success('Account created successfully!');
+      toast.success('¡Cuenta creada exitosamente!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Registration failed');
+      toast.error(error.response?.data?.detail || 'Error en el registro');
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Left Side - Branding */}
+      {/* Lado Izquierdo - Marca */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
@@ -66,18 +66,18 @@ const RegisterPage = () => {
             </Link>
             
             <h1 className="text-4xl font-heading font-bold mb-4">
-              Start your{' '}
-              <span className="gradient-text">learning adventure</span>
+              Comienza tu{' '}
+              <span className="gradient-text">aventura de aprendizaje</span>
             </h1>
             
             <p className="text-lg text-muted-foreground">
-              Join thousands of learners and instructors on the most innovative learning platform.
+              Únete a miles de estudiantes e instructores en la plataforma de aprendizaje más innovadora.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Right Side - Register Form */}
+      {/* Lado Derecho - Formulario */}
       <div className="flex-1 flex items-center justify-center p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,7 @@ const RegisterPage = () => {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md space-y-8"
         >
-          {/* Mobile Logo */}
+          {/* Logo Móvil */}
           <div className="lg:hidden text-center">
             <Link to="/" className="inline-flex items-center gap-2">
               <GraduationCap className="w-8 h-8 text-primary" />
@@ -94,16 +94,16 @@ const RegisterPage = () => {
           </div>
 
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl font-heading font-bold mb-2">Create your account</h2>
+            <h2 className="text-2xl font-heading font-bold mb-2">Crea tu cuenta</h2>
             <p className="text-muted-foreground">
-              Already have an account?{' '}
+              ¿Ya tienes cuenta?{' '}
               <Link to="/login" className="text-primary hover:underline" data-testid="login-link">
-                Sign in
+                Inicia sesión
               </Link>
             </p>
           </div>
 
-          {/* GitHub OAuth Button */}
+          {/* Botón GitHub OAuth */}
           <Button
             variant="outline"
             className="w-full h-12"
@@ -111,7 +111,7 @@ const RegisterPage = () => {
             data-testid="github-register-btn"
           >
             <Github className="mr-2 h-5 w-5" />
-            Continue with GitHub
+            Continuar con GitHub
           </Button>
 
           <div className="relative">
@@ -119,20 +119,20 @@ const RegisterPage = () => {
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">O continúa con</span>
             </div>
           </div>
 
-          {/* Registration Form */}
+          {/* Formulario de Registro */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="fullName">Nombre completo</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Juan Pérez"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="pl-10 h-12"
@@ -143,13 +143,13 @@ const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo electrónico</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="tu@ejemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12"
@@ -160,7 +160,7 @@ const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -178,14 +178,14 @@ const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">I want to</Label>
+              <Label htmlFor="role">Quiero</Label>
               <Select value={role} onValueChange={setRole} data-testid="role-select">
                 <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Select role" />
+                  <SelectValue placeholder="Seleccionar rol" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="student">Learn (Student)</SelectItem>
-                  <SelectItem value="instructor">Teach (Instructor)</SelectItem>
+                  <SelectItem value="student">Aprender (Estudiante)</SelectItem>
+                  <SelectItem value="instructor">Enseñar (Instructor)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -196,13 +196,13 @@ const RegisterPage = () => {
               disabled={loading}
               data-testid="register-submit-btn"
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
 
           <p className="text-xs text-center text-muted-foreground">
-            By signing up, you agree to our Terms of Service and Privacy Policy.
+            Al registrarte, aceptas nuestros Términos de Servicio y Política de Privacidad.
           </p>
         </motion.div>
       </div>

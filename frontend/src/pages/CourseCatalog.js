@@ -9,7 +9,6 @@ import {
   Search, 
   BookOpen, 
   Users, 
-  Clock,
   ChevronRight,
   Filter,
   X
@@ -46,7 +45,7 @@ const CourseCatalog = () => {
       const response = await axios.get(`${API_URL}/api/courses?${params.toString()}`);
       setCourses(response.data);
     } catch (error) {
-      console.error('Failed to fetch courses:', error);
+      console.error('Error al cargar cursos:', error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +56,7 @@ const CourseCatalog = () => {
       const response = await axios.get(`${API_URL}/api/courses/categories`);
       setCategories(response.data);
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      console.error('Error al cargar categorías:', error);
     }
   };
 
@@ -102,9 +101,18 @@ const CourseCatalog = () => {
     }
   };
 
+  const getLevelText = (lvl) => {
+    switch (lvl) {
+      case 'beginner': return 'Principiante';
+      case 'intermediate': return 'Intermedio';
+      case 'advanced': return 'Avanzado';
+      default: return lvl;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
+      {/* Navegación */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           <div className="flex items-center justify-between h-16">
@@ -117,21 +125,21 @@ const CourseCatalog = () => {
               {isAuthenticated ? (
                 <>
                   <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="nav-dashboard">
-                    Dashboard
+                    Panel
                   </Link>
                   <Link to="/profile" data-testid="nav-profile">
                     <Button variant="outline" size="sm">
-                      {user?.full_name || 'Profile'}
+                      {user?.full_name || 'Perfil'}
                     </Button>
                   </Link>
                 </>
               ) : (
                 <>
                   <Link to="/login" data-testid="nav-login">
-                    <Button variant="ghost" size="sm">Sign In</Button>
+                    <Button variant="ghost" size="sm">Iniciar Sesión</Button>
                   </Link>
                   <Link to="/register" data-testid="nav-register">
-                    <Button size="sm">Get Started</Button>
+                    <Button size="sm">Comenzar</Button>
                   </Link>
                 </>
               )}
@@ -140,26 +148,26 @@ const CourseCatalog = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* Contenido Principal */}
       <main className="pt-24 pb-16 px-6 md:px-12 lg:px-24">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Encabezado */}
           <div className="mb-12">
             <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4">
-              Explore Our <span className="gradient-text">Courses</span>
+              Explora Nuestros <span className="gradient-text">Cursos</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              Browse through our collection of expert-led courses and start your learning journey today.
+              Navega por nuestra colección de cursos dirigidos por expertos y comienza tu viaje de aprendizaje hoy.
             </p>
           </div>
 
-          {/* Search and Filters */}
+          {/* Búsqueda y Filtros */}
           <div className="glass-card p-6 mb-8">
             <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search courses..."
+                  placeholder="Buscar cursos..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-10"
@@ -171,10 +179,10 @@ const CourseCatalog = () => {
                 <Select value={category || 'all'} onValueChange={(v) => handleFilterChange('category', v)}>
                   <SelectTrigger className="w-[160px]" data-testid="category-filter">
                     <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue placeholder="Category" />
+                    <SelectValue placeholder="Categoría" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">Todas las Categorías</SelectItem>
                     {categories.map((cat) => (
                       <SelectItem key={cat.name} value={cat.name}>
                         {cat.name} ({cat.count})
@@ -185,38 +193,38 @@ const CourseCatalog = () => {
 
                 <Select value={level || 'all'} onValueChange={(v) => handleFilterChange('level', v)}>
                   <SelectTrigger className="w-[160px]" data-testid="level-filter">
-                    <SelectValue placeholder="Level" />
+                    <SelectValue placeholder="Nivel" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Levels</SelectItem>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="all">Todos los Niveles</SelectItem>
+                    <SelectItem value="beginner">Principiante</SelectItem>
+                    <SelectItem value="intermediate">Intermedio</SelectItem>
+                    <SelectItem value="advanced">Avanzado</SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Button type="submit" data-testid="search-btn">
-                  Search
+                  Buscar
                 </Button>
 
                 {hasFilters && (
                   <Button type="button" variant="ghost" onClick={clearFilters} data-testid="clear-filters-btn">
                     <X className="w-4 h-4 mr-2" />
-                    Clear
+                    Limpiar
                   </Button>
                 )}
               </div>
             </form>
           </div>
 
-          {/* Results Count */}
+          {/* Contador de Resultados */}
           <div className="mb-6">
             <p className="text-muted-foreground">
-              {loading ? 'Loading...' : `${courses.length} courses found`}
+              {loading ? 'Cargando...' : `${courses.length} cursos encontrados`}
             </p>
           </div>
 
-          {/* Courses Grid */}
+          {/* Grilla de Cursos */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
@@ -233,11 +241,11 @@ const CourseCatalog = () => {
           ) : courses.length === 0 ? (
             <div className="text-center py-16">
               <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No courses found</h3>
+              <h3 className="text-xl font-semibold mb-2">No se encontraron cursos</h3>
               <p className="text-muted-foreground mb-6">
-                Try adjusting your search or filters to find what you're looking for.
+                Intenta ajustar tu búsqueda o filtros para encontrar lo que buscas.
               </p>
-              <Button onClick={clearFilters}>Clear all filters</Button>
+              <Button onClick={clearFilters}>Limpiar todos los filtros</Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -263,7 +271,7 @@ const CourseCatalog = () => {
                       <Badge 
                         className={`absolute top-4 left-4 ${getLevelColor(course.level)}`}
                       >
-                        {course.level}
+                        {getLevelText(course.level)}
                       </Badge>
                       {!course.is_free && (
                         <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground">
@@ -284,14 +292,14 @@ const CourseCatalog = () => {
                       </h3>
                       
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                        {course.description || 'No description available'}
+                        {course.description || 'Sin descripción disponible'}
                       </p>
 
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div className="flex items-center gap-4">
                           <span className="flex items-center gap-1">
                             <BookOpen className="w-4 h-4" />
-                            {course.lessons_count} lessons
+                            {course.lessons_count} lecciones
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
